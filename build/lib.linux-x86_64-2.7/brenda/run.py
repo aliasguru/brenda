@@ -1,25 +1,25 @@
-# Brenda -- Blender render tool for Amazon Web Services
-# Copyright (C) 2013 James Yonan <james@openvpn.net>
+#    Brenda -- Blender render tool for Amazon Web Services
+#    Copyright (C) 2013 James Yonan <james@openvpn.net>
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os, time
 from brenda import aws, utils
 from brenda.ami import AMI_ID
 
 def demand(opts, conf):
-    ami_id = utils.get_opt(opts.ami, conf, 'AMI_ID', default=AMI_ID, must_exist=True)
+    ami_id = utils.get_opt(opts.ami, conf, 'AMI_ID', default = AMI_ID, must_exist = True)
     itype = brenda_instance_type(opts, conf)
     snapshots = aws.get_snapshots(conf)
     bdm, snap_description, istore_dev = aws.blk_dev_map(opts, conf, itype, snapshots)
@@ -54,15 +54,15 @@ def demand(opts, conf):
     print "SSH key name:", ssh_key_name
     print "Security groups:", sec_groups
     print_script(opts, conf, script)
-    aws.get_done(opts, conf) # sanity check on DONE var
+    aws.get_done(opts, conf)    #    sanity check on DONE var
     if not opts.dry_run:
         ec2 = aws.get_ec2_conn(conf)
         reservation = ec2.run_instances(**run_args)
         print reservation
 
 def spot(opts, conf):
-    ami_id = utils.get_opt(opts.ami, conf, 'AMI_ID', default=AMI_ID, must_exist=True)
-    price = utils.get_opt(opts.price, conf, 'BID_PRICE', must_exist=True)
+    ami_id = utils.get_opt(opts.ami, conf, 'AMI_ID', default = AMI_ID, must_exist = True)
+    price = utils.get_opt(opts.price, conf, 'BID_PRICE', must_exist = True)
     reqtype = 'persistent' if opts.persistent else 'one-time'
     itype = brenda_instance_type(opts, conf)
     snapshots = aws.get_snapshots(conf)
@@ -103,7 +103,7 @@ def spot(opts, conf):
     print "SSH key name:", ssh_key_name
     print "Security groups:", sec_groups
     print_script(opts, conf, script)
-    aws.get_done(opts, conf) # sanity check on DONE var
+    aws.get_done(opts, conf)    #    sanity check on DONE var
     if not opts.dry_run:
         ec2 = aws.get_ec2_conn(conf)
         reservation = ec2.request_spot_instances(**run_args)
@@ -113,9 +113,9 @@ def price(opts, conf):
     ec2 = aws.get_ec2_conn(conf)
     itype = brenda_instance_type(opts, conf)
     data = {}
-    for item in ec2.get_spot_price_history(instance_type=itype,
-                                           product_description="Linux/UNIX"):
-        # show the most recent price for each availability zone
+    for item in ec2.get_spot_price_history(instance_type = itype,
+                                           product_description = "Linux/UNIX"):
+        #    show the most recent price for each availability zone
         if item.availability_zone in data:
             if item.timestamp > data[item.availability_zone].timestamp:
                 data[item.availability_zone] = item
@@ -164,12 +164,12 @@ def script(opts, conf):
 def init(opts, conf):
     ec2 = aws.get_ec2_conn(conf)
 
-    # create ssh key pair
+    #    create ssh key pair
     if not opts.no_ssh_keys:
         try:
             ssh_key_name = conf.get("SSH_KEY_NAME", "brenda")
             if not opts.aws_ssh_pull and aws.local_ssh_keys_exist(opts, conf):
-                # push local ssh public key to AWS
+                #    push local ssh public key to AWS
                 pubkey_fn = aws.get_ssh_pubkey_fn(opts, conf)
                 print "Pushing ssh public key %r to AWS under %r key pair." % (pubkey_fn, ssh_key_name)
                 with open(pubkey_fn) as f:
@@ -177,10 +177,10 @@ def init(opts, conf):
                     res = ec2.import_key_pair(ssh_key_name, pubkey)
                     print res
             else:
-                # get new ssh public key pair from AWS
-                brenda_ssh_ident_fn = aws.get_brenda_ssh_identity_fn(opts, conf, mkdir=True)
+                #    get new ssh public key pair from AWS
+                brenda_ssh_ident_fn = aws.get_brenda_ssh_identity_fn(opts, conf, mkdir = True)
                 print "Fetching ssh private key from AWS into %r under %r key pair." % (brenda_ssh_ident_fn, ssh_key_name)
-                keypair = ec2.create_key_pair(key_name=ssh_key_name)
+                keypair = ec2.create_key_pair(key_name = ssh_key_name)
                 with open(brenda_ssh_ident_fn, 'w') as f:
                     pass
                 os.chmod(brenda_ssh_ident_fn, 0600)
@@ -189,26 +189,26 @@ def init(opts, conf):
         except Exception, e:
             print "Error creating ssh key pair", e
 
-    # create security group
+    #    create security group
     if not opts.no_security_group:
         try:
             sec_group = conf.get("SECURITY_GROUP", "brenda")
             print "Creating AWS security group %r." % (sec_group,)
             sg = ec2.create_security_group(sec_group, 'Brenda security group')
-            sg.authorize('tcp', 22, 22, '0.0.0.0/0')  # ssh
-            sg.authorize('icmp', -1, -1, '0.0.0.0/0') # all ICMP
+            sg.authorize('tcp', 22, 22, '0.0.0.0/0')    #    ssh
+            sg.authorize('icmp', -1, -1, '0.0.0.0/0')    #    all ICMP
         except Exception, e:
             print "Error creating security group", e
 
 def reset_keys(opts, conf):
     ec2 = aws.get_ec2_conn(conf)
 
-    # remove ssh keys
+    #    remove ssh keys
     if not opts.no_ssh_keys:
         try:
             ssh_key_name = conf.get("SSH_KEY_NAME", "brenda")
             print "Removing AWS ssh key pair %r." % (ssh_key_name,)
-            ec2.delete_key_pair(key_name=ssh_key_name)
+            ec2.delete_key_pair(key_name = ssh_key_name)
             brenda_ssh_ident_fn = aws.get_brenda_ssh_identity_fn(opts, conf)
             if os.path.exists(brenda_ssh_ident_fn):
                 print "Removing AWS local ssh identity %r." % (brenda_ssh_ident_fn,)
@@ -216,31 +216,31 @@ def reset_keys(opts, conf):
         except Exception, e:
             print "Error removing ssh key pair", e
 
-    # remove security group
+    #    remove security group
     if not opts.no_security_group:
         try:
             sec_group = conf.get("SECURITY_GROUP", "brenda")
             print "Removing AWS security group %r." % (sec_group,)
-            ec2.delete_security_group(name=sec_group)
+            ec2.delete_security_group(name = sec_group)
         except Exception, e:
             print "Error removing security group", e
 
 def startup_script(opts, conf, istore_dev):
-    login_dir = "/root"
+    login_dir = "/home/ubuntu"
 
     head = "#!/bin/bash\n"
 
-    # Pre-run script?
+    #    Pre-run script?
     startup_prerun = conf.get('STARTUP_PRERUN', False)
     if startup_prerun:
         head += startup_prerun + "\n"
 
-    # use EC2 instance store on render farm instance?
+    #    use EC2 instance store on render farm instance?
     use_istore = int(conf.get('USE_ISTORE', '1' if istore_dev else '0'))
 
     if use_istore:
-        # script to start brenda-node running
-        # on the EC2 instance store
+        #    script to start brenda-node running
+        #    on the EC2 instance store
         iswd = conf.get('WORK_DIR', '/mnt/brenda')
         if iswd != login_dir:
             head += """\
@@ -252,6 +252,9 @@ if ! [ -d "$B" ]; then
   done
 fi
 export BRENDA_WORK_DIR="."
+export BLENDER_USER_CONFIG=/CustomSoftware/BlenderPrefs/UserConfigs/Rainer/
+export BLENDER_USER_SCRIPTS=/CustomSoftware/BlenderPrefs/scripts/
+export OCIO=/CustomSoftware/filmic-blender/config.ocio
 mkdir -p "$B"
 cd "$B"
 """ % (iswd, login_dir)
@@ -313,4 +316,4 @@ def print_script(opts, conf, script):
             print '  ', line
 
 def brenda_instance_type(opts, conf):
-    return utils.get_opt(opts.instance_type, conf, 'INSTANCE_TYPE', default="m2.xlarge")
+    return utils.get_opt(opts.instance_type, conf, 'INSTANCE_TYPE', default = "m2.xlarge")
