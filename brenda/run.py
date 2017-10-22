@@ -226,14 +226,32 @@ def reset_keys(opts, conf):
             print "Error removing security group", e
 
 def startup_script(opts, conf, istore_dev):
+    def addInfo():
+
+        return """\
+echo user
+echo ----
+whoami
+echo current location
+echo ----------------
+pwd
+echo environment variables:
+echo ----------------------
+printenv
+echo ----------------------
+"""
+
     login_dir = "/home/ubuntu"
 
     head = "#!/bin/bash\n"
+    head += addInfo()
 
     #    Pre-run script?
     startup_prerun = conf.get('STARTUP_PRERUN', False)
     if startup_prerun:
         head += startup_prerun + "\n"
+
+    head += addInfo()
 
     #    use EC2 instance store on render farm instance?
     use_istore = int(conf.get('USE_ISTORE', '1' if istore_dev else '0'))
@@ -252,9 +270,9 @@ if ! [ -d "$B" ]; then
   done
 fi
 export BRENDA_WORK_DIR="."
-export BLENDER_USER_CONFIG=/CustomSoftware/BlenderPrefs/UserConfigs/Rainer/
-export BLENDER_USER_SCRIPTS=/CustomSoftware/BlenderPrefs/scripts/
-export OCIO=/CustomSoftware/filmic-blender/config.ocio
+# export BLENDER_USER_CONFIG=/CustomSoftware/BlenderPrefs/UserConfigs/Rainer/
+# export BLENDER_USER_SCRIPTS=/CustomSoftware/BlenderPrefs/scripts/
+# export OCIO=/CustomSoftware/filmic-blender/config.ocio
 mkdir -p "$B"
 cd "$B"
 """ % (iswd, login_dir)
@@ -262,6 +280,8 @@ cd "$B"
             head += 'cd "%s"\n' % (login_dir,)
     else:
         head += 'cd "%s"\n' % (login_dir,)
+
+    head += addInfo()
 
     head += "/usr/local/bin/brenda-node --daemon <<EOF\n"
     tail = "EOF\n"
@@ -302,6 +322,9 @@ cd "$B"
         v = conf.get(k)
         if v:
             script += "%s=%s\n" % (k, v)
+
+    script += addInfo()
+
     script += tail
     return script
 
