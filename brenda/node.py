@@ -277,8 +277,15 @@ def run_tasks(opts, args, conf):
                     __folderName__ = 'AWS_File_Output'
                     try:
                         print('Work Dir is:   %s' % work_dir)
+                        #    work_dir = /mnt/brenda
+
+                        print('Project Dir is:   %s' % proj_dir)
+                        #    work_dir = /mnt/brenda
+
                         print('Output Dir is: %s' % local.task_active.outdir)
-                        copy_tree(os.path.join(work_dir, __folderName__), os.path.join(local.task_active.outdir, __folderName__))
+                        #    outdir is correct!
+
+                        copy_tree(os.path.join(proj_dir, __folderName__), os.path.join(local.task_active.outdir, __folderName__))
 
                     except DistutilsFileError:
                         print('Skipping File Output search, dir %s does not exist' % __folderName__)
