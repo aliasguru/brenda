@@ -15,6 +15,8 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os, sys, signal, subprocess, multiprocessing, stat, time
+from distutils.dir_util import copy_tree
+from distutils.errors import DistutilsFileError
 
 from brenda import aws, utils, error
 import paracurl
@@ -271,6 +273,12 @@ def run_tasks(opts, args, conf):
 
                     #    TODO: So Cheeere we chaaaave the moment when the files should get uploaded
                     #    here I need to inject the copy command, so that file output nodes are also copied to S3
+                    #    running a few first tests now
+                    __folderName__ = 'AWS_File_Output'
+                    try:
+                        copy_tree(os.path.join(work_dir, __folderName__), os.path.join(local.task_active.outdir, __folderName__))
+                    except DistutilsFileError:
+                        print('Skipping File Output search, dir %s does not exist' % __folderName__)
 
                     local.task_active.proc = start_s3_push_process(opts, args, conf, local.task_active.outdir)
                     local.task_push = local.task_active
