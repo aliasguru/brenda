@@ -15,7 +15,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os, sys, signal, subprocess, multiprocessing, stat, time
-from distutils.dir_util import copy_tree
+from distutils.dir_util import copy_tree, remove_tree
 from distutils.errors import DistutilsFileError
 
 from brenda import aws, utils, error
@@ -285,7 +285,12 @@ def run_tasks(opts, args, conf):
                         print('Output Dir is: %s' % local.task_active.outdir)
                         #    outdir is correct!
 
+                        print ('Starting copy process')
                         copy_tree(os.path.join(proj_dir, __folderName__), os.path.join(local.task_active.outdir, __folderName__))
+
+                        print('removing source dir')
+                        remove_tree(os.path.join(proj_dir, __folderName__))
+                        print('Copy process finished')
 
                     except DistutilsFileError:
                         print('Skipping File Output search, dir %s does not exist' % __folderName__)
