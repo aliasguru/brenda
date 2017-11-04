@@ -277,8 +277,12 @@ def run_tasks(opts, args, conf):
                     __folderName__ = 'AWS_File_Output'
                     try:
                         copy_tree(os.path.join(work_dir, __folderName__), os.path.join(local.task_active.outdir, __folderName__))
+
                     except DistutilsFileError:
                         print('Skipping File Output search, dir %s does not exist' % __folderName__)
+
+                    except Exception as exc:
+                        print('An error occured when trying to copy output file nodes over: %s' % exc)
 
                     local.task_active.proc = start_s3_push_process(opts, args, conf, local.task_active.outdir)
                     local.task_push = local.task_active
