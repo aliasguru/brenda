@@ -52,10 +52,13 @@ def start_s3_push_process(opts, args, conf, outdir):
 def s3_push_process(opts, args, conf, outdir):
     def do_s3_push():
         bucktup = aws.get_s3_output_bucket(conf)
+
+        print('Pushing output to AWS S3 bucket %s' % bucktup)
+
         for dirpath, dirnames, filenames in os.walk(outdir):
             for f in filenames:
                 path = os.path.join(dirpath, f)
-                print "PUSH", path, "TO", aws.format_s3_url(bucktup, f)
+                print ("PUSH %s TO TARGET %s" % (path, aws.format_s3_url(bucktup, f)))
                 aws.put_s3_file(bucktup, path, f)
             break
 
