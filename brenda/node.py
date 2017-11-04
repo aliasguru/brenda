@@ -276,6 +276,8 @@ def run_tasks(opts, args, conf):
                     #    running a few first tests now
                     __folderName__ = 'AWS_File_Output'
                     try:
+                        print('Work Dir is:   %s' % work_dir)
+                        print('Output Dir is: %s' % local.task_active.outdir)
                         copy_tree(os.path.join(work_dir, __folderName__), os.path.join(local.task_active.outdir, __folderName__))
 
                     except DistutilsFileError:
