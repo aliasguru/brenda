@@ -60,7 +60,7 @@ def s3_push_process(opts, args, conf, outdir):
                 path = os.path.join(dirpath, f)
                 print ("PUSH %s TO TARGET %s" % (path, aws.format_s3_url(bucktup, f)))
                 aws.put_s3_file(bucktup, path, f)
-            break
+            #    break
 
     try:
         print('Issuing push command to S3')
