@@ -63,6 +63,7 @@ def s3_push_process(opts, args, conf, outdir):
             break
 
     try:
+        print('Issuing push command to S3')
         error.retry(conf, do_s3_push)
     except Exception, e:
         print "S3 push failed:", e
