@@ -57,9 +57,11 @@ def s3_push_process(opts, args, conf, outdir):
 
         for dirpath, dirnames, filenames in os.walk(outdir):
             for f in filenames:
+                partPath = '%s/' % os.path.relpath(dirpath, start = outdir) if outdir != dirpath else ''
+                s3path = '%s%s' % (partPath, f)
                 path = os.path.join(dirpath, f)
-                print ("PUSH %s TO TARGET %s" % (path, aws.format_s3_url(bucktup, f)))
-                aws.put_s3_file(bucktup, path, f)
+                print ("PUSH %s TO TARGET %s" % (path, aws.format_s3_url(bucktup, s3path)))
+                aws.put_s3_file(bucktup, path, s3path)
             #    break
 
     try:
