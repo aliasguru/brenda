@@ -109,6 +109,9 @@ def format_s3_url(bucktup, s3name):
     """
     bucktup is the return tuple of get_s3_output_bucket_name
     """
+    print('bucktup[1][0] is %s' % bucktup[1][0])
+    print('bucktup[1][1] is %s' % bucktup[1][1])
+    print('s3name: %s' % s3name)
     return "s3://%s/%s%s" % (bucktup[1][0], bucktup[1][1], s3name)
 
 def get_s3_output_bucket_name(conf):
